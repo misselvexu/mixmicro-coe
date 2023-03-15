@@ -112,6 +112,21 @@ public interface Validated extends Iterable<Validated> {
 
     @Nullable <T> T getValue();
 
+    @Nullable default T getValueOrThrow() {
+        if (isInvalid()) {
+            throw new ValidationException(this);
+        }
+        return getValue();
+    }
+
+    default T getValueNonNullOrThrow() {
+        T value = getValueOrThrow();
+        if (value == null) {
+            throw new NoSuchElementException("Value does not exist");
+        }
+        return value;
+    }
+
     /**
      * Indicates that no validation has occurred. None is considered "valid", effectively a no-op validation.
      */
