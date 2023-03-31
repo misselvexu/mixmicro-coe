@@ -87,7 +87,7 @@ public class ChangePropertyValue extends Recipe {
         public Properties visitEntry(Properties.Entry entry, P p) {
             if (!Boolean.FALSE.equals(relaxedBinding) ? NameCaseConvention.equalsRelaxedBinding(entry.getKey(), propertyKey) : entry.getKey().equals(propertyKey)) {
                 if (oldValue == null ? !entry.getValue().getText().equals(newValue) : oldValue.equals(entry.getValue().getText())) {
-                    entry = entry.withValue(entry.getValue().withText(newValue));
+                    entry = entry.withValue(entry.getValue().withText(newValue).withSource(newValue));
                 }
             }
             return super.visitEntry(entry, p);

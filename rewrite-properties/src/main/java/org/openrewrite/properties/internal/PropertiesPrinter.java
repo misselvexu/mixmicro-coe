@@ -44,7 +44,7 @@ public class PropertiesPrinter<P> extends PropertiesVisitor<PrintOutputCapture<P
             p.out.append(entry.getDelimiter().getCharacter());
         }
         beforeSyntax(entry.getValue().getPrefix(), entry.getValue().getMarkers(), p);
-        p.out.append(entry.getValue().getText());
+        p.out.append(entry.getValue().getSource());
         afterSyntax(entry.getValue().getMarkers(), p);
         afterSyntax(entry, p);
         return entry;

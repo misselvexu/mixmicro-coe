@@ -34,11 +34,15 @@ import java.nio.file.Path;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
+import java.util.regex.Pattern;
 
 import static java.util.stream.Collectors.toList;
 import static org.openrewrite.Tree.randomId;
 
 public class PropertiesParser implements Parser<Properties.File> {
+
+    private static final Pattern LINE_CONTINUATION_PATTERN = Pattern.compile("\\\\\\R\\s*");
+
     @Override
     public List<Properties.File> parse(@Language("properties") String... sources) {
         return parse(new InMemoryExecutionContext(), sources);
@@ -83,6 +87,7 @@ public class PropertiesParser implements Parser<Properties.File> {
         for (char c : s.toCharArray()) {
             if (isEscapedNewLine) {
                 if (Character.isWhitespace(c)) {
+                    buff.append(c);
                     continue;
                 } else {
                     isEscapedNewLine = false;
@@ -92,7 +97,7 @@ public class PropertiesParser implements Parser<Properties.File> {
             if (c == '\n') {
                 if (prev == '\\') {
                     isEscapedNewLine = true;
-                    buff.deleteCharAt(buff.length() - 1);
+                    buff.append(c);
                 } else {
                     Properties.Content content = extractContent(buff.toString(), prefix);
                     if (content != null) {
@@ -263,6 +268,8 @@ public class PropertiesParser implements Parser<Properties.File> {
             prev = c;
         }
 
+        String sourceValue = value.toString();
+        String textValue = LINE_CONTINUATION_PATTERN.matcher(sourceValue).replaceAll("");
         return new Properties.Entry(
                 randomId(),
                 prefixBuilder.toString(),
@@ -270,7 +277,7 @@ public class PropertiesParser implements Parser<Properties.File> {
                 key.toString(),
                 equalsPrefix.toString(),
                 delimiter,
-                new Properties.Value(randomId(), valuePrefix.toString(), Markers.EMPTY, value.toString())
+                new Properties.Value(randomId(), valuePrefix.toString(), Markers.EMPTY, textValue, sourceValue)
         );
     }
 

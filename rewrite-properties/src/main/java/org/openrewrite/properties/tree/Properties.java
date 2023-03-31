@@ -195,6 +195,7 @@ public interface Properties extends Tree {
         String prefix;
         Markers markers;
         String text;
+        String source;
     }
 
     @lombok.Value
